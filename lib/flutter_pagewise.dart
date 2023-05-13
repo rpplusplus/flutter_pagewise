@@ -2,6 +2,7 @@ library flutter_pagewise;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_pagewise/helpers/grid_helpers.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 typedef Widget ItemBuilder<T>(BuildContext context, T entry, int index);
 typedef Future<List<T>> PageFuture<T>(int? pageIndex);
@@ -406,7 +407,7 @@ class PagewiseState<T> extends State<Pagewise<T>> {
 class PagewiseLoadController<T> extends ChangeNotifier {
   List<T>? _loadedItems;
   late List _appendedItems;
-  int _numberOfLoadedPages=0;
+  int _numberOfLoadedPages = 0;
   bool? _hasMoreItems;
   Object? _error;
   late bool _isFetching;
@@ -864,6 +865,56 @@ class PagewiseSliverGrid<T> extends Pagewise<T> {
                         crossAxisSpacing: crossAxisSpacing,
                         mainAxisSpacing: mainAxisSpacing,
                         itemCount: state._itemCount),
+              );
+            });
+}
+
+class PagewiseMasonryGrid<T> extends Pagewise<T> {
+  PagewiseMasonryGrid(
+      {Key? key,
+      bool addSemanticIndexes = true,
+      bool addAutomaticKeepAlives = true,
+      bool addRepaintBoundaries = true,
+      SemanticIndexCallback semanticIndexCallback =
+          _kDefaultSemanticIndexCallback,
+      int semanticIndexOffset = 0,
+      PagewiseLoadController<T>? pageLoadController,
+      int? pageSize,
+      PageFuture<T>? pageFuture,
+      LoadingBuilder? loadingBuilder,
+      RetryBuilder? retryBuilder,
+      NoItemsFoundBuilder? noItemsFoundBuilder,
+      bool showRetry = true,
+      required ItemBuilder<T> itemBuilder,
+      ErrorBuilder? errorBuilder,
+      required int crossAxisCount,
+      required double mainAxisSpacing,
+      required double crossAxisSpacing})
+      : super(
+            pageSize: pageSize,
+            pageFuture: pageFuture,
+            pageLoadController: pageLoadController,
+            key: key,
+            loadingBuilder: loadingBuilder,
+            retryBuilder: retryBuilder,
+            showRetry: showRetry,
+            itemBuilder: itemBuilder,
+            errorBuilder: errorBuilder,
+            noItemsFoundBuilder: noItemsFoundBuilder,
+            builder: (PagewiseState<T> state) {
+              return SliverMasonryGrid(
+                gridDelegate: SliverSimpleGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: crossAxisCount,
+                ),
+                mainAxisSpacing: mainAxisSpacing,
+                crossAxisSpacing: crossAxisSpacing,
+                delegate: SliverChildBuilderDelegate(state._itemBuilder,
+                    addAutomaticKeepAlives: addAutomaticKeepAlives,
+                    addRepaintBoundaries: addRepaintBoundaries,
+                    addSemanticIndexes: addSemanticIndexes,
+                    semanticIndexCallback: semanticIndexCallback,
+                    semanticIndexOffset: semanticIndexOffset,
+                    childCount: state._itemCount),
               );
             });
 }
